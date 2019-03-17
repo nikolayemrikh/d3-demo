@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Демо: передаем данные из ace-редактора в iframe</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <main class="demo">
+      <div class="demo__item">
+        <div class="editor-list">
+          <div class="editor-list__item editor-container">
+            <span class="editor-list__item-title">HTML</span>
+            <div class="editor-container__editor js-editor-html"></div>
+          </div>
+          <div class="editor-list__item editor-container">
+            <span class="editor-list__item-title">JS (D3)</span>
+            <div class="editor-container__editor js-editor-js"></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo__item demo__preview js-frame-containter">
+        <iframe class="demo__preview-frame js-frame"></iframe>
+      </div>
+    </main>
+
+    <script src="lib/data/initials.js"></script>
+    <script src="lib/ace/ace.js"></script>
+    <script>
+      const htmlEditor = ace.edit(document.querySelector('.js-editor-html'));
+      htmlEditor.session.setMode("ace/mode/html"); // Режим редактора — HTML
+      htmlEditor.session.setTabSize(2);
+      htmlEditor.setValue(window.initialCode.initialHTML);
+
+      const jsEditor = ace.edit(document.querySelector('.js-editor-js'));
+      jsEditor.session.setMode("ace/mode/javascript"); // Режим редактора — javascript
+      jsEditor.session.setTabSize(2);
+      jsEditor.setValue(window.initialCode.initialJS);
+    
+      const frame = document.querySelector('.js-frame');
+      const doc = frame.contentDocument;
+
+      let interval = null;
+      function onChange () {
+        clearInterval(interval);
+        interval = setTimeout(() => {
+          doc.write(htmlEditor.getValue());
+          doc.addEventListener('DOMContentLoaded', () => {
+            const script = doc.createElement('script');
+            script.textContent = jsEditor.getValue();
+            doc.body.appendChild(script);
+          })
+          doc.close();
+        }, 1000);
+      }
+      jsEditor.getSession().on('change', onChange);
+      htmlEditor.getSession().on('change', onChange);
+      onChange();
+    </script>
+  </body>
+</html>
