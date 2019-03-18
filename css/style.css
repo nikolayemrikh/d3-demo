@@ -8,10 +8,6 @@
   flex: 1 0 50%;
 }
 
-.demo__preview {
-  border: 1px solid #eeeeee;
-}
-
 .vertical-list {
   display: flex;
   flex-direction: column;
@@ -26,6 +22,7 @@
 
 .item {
   position: relative;
+  border: 1px solid #eeeeee;
 }
 
 .item__inner {

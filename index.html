@@ -19,7 +19,7 @@
           </div>
         </div>
       </div>
-      <div class="demo__item">
+      <div class="demo__item item">
         <span class="item__title">Результат</span>
         <div class="item__inner demo__preview js-frame-containter"></div>
       </div>
@@ -32,12 +32,13 @@
       htmlEditor.session.setMode("ace/mode/html"); // Режим редактора — HTML
       htmlEditor.session.setTabSize(2);
       htmlEditor.setValue(window.initialCode.initialHTML);
-      
+      htmlEditor.clearSelection();
 
       const jsEditor = ace.edit(document.querySelector('.js-editor-js'));
       jsEditor.session.setMode("ace/mode/javascript"); // Режим редактора — javascript
       jsEditor.session.setTabSize(2);
       jsEditor.setValue(window.initialCode.initialJS);
+      jsEditor.clearSelection();
       
       const getIframe = () => {
         const frame = document.createElement('iframe');
