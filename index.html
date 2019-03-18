@@ -11,15 +11,18 @@
         <div class="vertical-list">
           <div class="vertical-list__item item editor-container">
             <span class="item__title">HTML</span>
-            <div class="max-w-h js-editor-html"></div>
+            <div class="item__inner js-editor-html"></div>
           </div>
           <div class="vertical-list__item item editor-container">
             <span class="item__title">JS (D3)</span>
-            <div class="max-w-h js-editor-js"></div>
+            <div class="item__inner js-editor-js"></div>
           </div>
         </div>
       </div>
-      <div class="demo__item demo__preview js-frame-containter"></div>
+      <div class="demo__item">
+        <span class="item__title">Результат</span>
+        <div class="item__inner demo__preview js-frame-containter"></div>
+      </div>
     </main>
 
     <script src="lib/data/initials.js"></script>
@@ -29,6 +32,7 @@
       htmlEditor.session.setMode("ace/mode/html"); // Режим редактора — HTML
       htmlEditor.session.setTabSize(2);
       htmlEditor.setValue(window.initialCode.initialHTML);
+      
 
       const jsEditor = ace.edit(document.querySelector('.js-editor-js'));
       jsEditor.session.setMode("ace/mode/javascript"); // Режим редактора — javascript
@@ -42,31 +46,35 @@
       };
 
       const frameContainer = document.querySelector('.js-frame-containter');
+
+      const makeChanges = () => {
+        frameContainer.innerHTML = '';
+        
+        const frame = getIframe();
+        frameContainer.appendChild(frame);
+        
+        const doc = frame.contentDocument;
+        
+        const script = doc.createElement('script'); // Создаем скрипт из кода студента, в котором он работал с d3
+        script.textContent = jsEditor.getValue(); // Кладем в него содержимое редактора
+        
+        doc.write(htmlEditor.getValue());
+        doc.addEventListener('DOMContentLoaded', () => {
+          doc.body.appendChild(script); // Вставляем, только когда документ отрисовался
+        })
+        doc.close();
+      };
+      makeChanges();
       
       let interval = null;
-      function onChange () {
+      const onChange = () => {
         clearInterval(interval);
         interval = setTimeout(() => {
-          frameContainer.innerHTML = '';
-          
-          const frame = getIframe();
-          frameContainer.appendChild(frame);
-          
-          const doc = frame.contentDocument;
-          
-          const script = doc.createElement('script'); // Создаем скрипт из кода студента, в котором он работал с d3
-          script.textContent = jsEditor.getValue(); // Кладем в него содержимое редактора
-          
-          doc.write(htmlEditor.getValue());
-          doc.addEventListener('DOMContentLoaded', () => {
-            doc.body.appendChild(script); // Вставляем, только когда документ отрисовался
-          })
-          doc.close();
+          makeChanges();
         }, 1000);
       }
       jsEditor.getSession().on('change', onChange);
       htmlEditor.getSession().on('change', onChange);
-      onChange();
-    </script>
+      </script>
   </body>
 </html>
